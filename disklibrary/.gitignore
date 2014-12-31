@@ -1,0 +1,12 @@
+# Ignore everything
+*
+
+# But not these files...
+
+!.gitignore
+!BIOS
+!bios_src.zip
+!floppy.img
+!floppy.pristine.img
+!VGABIOS
+!vgabios_src.zip

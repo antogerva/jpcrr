@@ -1,0 +1,560 @@
+Changes at JPC-RR Release r11.8-rc1-test1:
+==================================
+-Added keyboard binding synchronization.
+-Added UI button on VirtualKeyboard to move mouse motion.
+-Added UI button on VirtualKeyboard to test the press/release mouse button feature.
+
+Changes since JPC-RR Release 11.5:
+==================================
+Don't crash if Lua asks for an invalid event.
+Fix asking for events from Lua.
+
+Changes from JPC-RR Release 11.4 to JPC-RR Release 11.5:
+========================================================
+- Don't try to stuff CDs into fdb.
+- streamtools: Backport newer x264 driver.
+- remove scripts/encode.lua
+- Add host-specific Lua memory.
+- Fix error in jpcrr.project_id().
+- Show MIDI UART activity.
+- Use BigInteger for rerecords.
+- Export counters related to IRQ0 to Lua.
+- Correctly autodetect FPU in CMOS equipment byte.
+- Emulator status display.
+- Get gameinfo right in unattended dumping.
+- Some more VGA status display.
+- Fix bug in handling linefeeds in VGAChargen.
+- Make host memory reads and writes atomic.
+- Correctly parse huge rerecord counts in streamtools.
+
+Changes from JPC-RR Release 11.3 to JPC-RR Release 11.4:
+========================================================
+- Export some VGA counters (retraces seen and scrolls) to Lua.
+- Add ability to edit game name from the UI.
+- Fix desync if savestate is created while joystick multivibrator is in unstable state.
+- Don't crash if stdin is not readable.
+- Get MD5 of empty files right.
+- Fix the add image dialog.
+
+Changes from JPC-RR Release 11.2 to JPC-RR Release 11.3:
+========================================================
+- Add feature to show framerate.
+- Add feature to make debug dump of VGA I/O and memory writes.
+- General MIDI support.
+- Add feature to allow multiple initial states.
+
+Changes from JPC-RR Release 11.1 to JPC-RR Release 11.2:
+========================================================
+- Make some modules default in assembly dialog.
+- Various improvements to streamtools
+
+Changes from JPC-RR Release 11 to JPC-RR Release 11.1:
+======================================================
+- Fix palette buffer overruns in VGA code.
+- Add HQX resize driver.
+- Output-drv-x264: Automatically pass correct constant framerate.
+- Less crashing due to exceptions thrown out of various stream converter programs.
+- Make other file ops than save/load use different dialog.
+- Fix = vs space in x264 and oggenc drivers.
+- New FAAC output driver.
+- Send clicks to monitor panel to Lua (for instance for mouse emulation).
+
+Changes from JPC-RR Release 10.5 to JPC-RR Release 11:
+======================================================
+- Lock out odd/even when in graphics mode.
+- Merge fixes in r10.6
+- Merge fixes in r10.7
+- Document some undocumented Lua operations.
+- New Lua functions bit.signextend and bit.tosigned.
+- Merge fixes in r10.8
+- Implement P478 for Rayman.
+- Implement CRx operations in VM86 mode.
+- Merge fixes in r10.9
+- Include monitor panel in PCControl.
+- Show time in statusbar.
+- Don't use popups, use statusbar.
+- Fix deadlock when resizing monitor.
+- Merge fixes in r10.10.
+- Fix compile error.
+- Merge fixes in r10.11.
+- Merge the build system revamp.
+- Merge fixes in r10.12.
+- Merge selfmodify fix and LDT/TSS fix.
+- Merge fixes in r10.13.
+- Change even-odd lockout condition from graphics mode to Axxxx
+  addresses only (to fix garbled graphics in CGA games).
+- Merge build fixes form r10 mainintance branch.
+- Merge fixes in r10.14.
+- Merge some fixes from r10 maint branch.
+- Don't repaint monitor on retach, rely on VGA output cycles.
+- Do VGA output cycle on PC stop.
+- Rework the Lua waiting system.
+- Make window member not superclass of PCControl.
+- Close the image backing files on image GC.
+- Merge some fixes from r10 maint branch.
+- Support resetting pixel panning on line compare.
+- Prevent races in HUDRenderer.
+- Properly name Monitor Panel thread.
+- Merge fixes in r10.15.
+- Don't deadlock if setTask is called with busy PC execution thread.
+- Add method to obtain VGA frame number.
+- Add methods to access event stream from Lua.
+- Add method to send event with specified low time bound.
+- Add method to query key state at input edge.
+- Fix crash on event stream truncation.
+- Don't do weird stuff with VGA frame numbers.
+- Support savestate drag'n'drop loading.
+- Don't loadstate via DnD when running.
+- Add option to dump every frame with frametimes.
+- Fix NPE when canceling loadstate.
+- Add emuname for telling apart multiple emulators.
+- Add hotkeys for screenshots.
+- Merge fixes in r10 maint branch.
+- Merge fixes in r10.16
+- Fix loadstate from Lua not to crash the emulator.
+- Merge r10 maint fixes.
+- Fix some save/movie handling bugs in Lua.
+- Show what keyedge timing is if its incorrect (makes hexing easier).
+- Don't crash if VBE register #10 is poked.
+- Add some Lua math functions.
+- Add some more Lua math functions.
+- Some Lua onevent functions.
+- Make soundcard spam less.
+- Don't do undesirable things if stop_and_execute is recursively entered.
+- Lua window extension.
+- Add remaining Lua onevent functions.
+- Fix Lua repaint callback.
+- Add some debugging output options.
+- Add memory search.
+- Fix VGA DAC write indexes.
+- Allow coloring components in lua window support.
+- Remove debug messages accidentially left in.
+- Add new dumping system.
+- Allow direct output to I420.
+- oggenc and x264 output drivers.
+- Add nearest neighbor resizer.
+- Add image dumping support.
+— Fix HDD image dumping.
+- Refactor system flags (less places to modify to add one).
+- Add gameinfo variables.
+- Add mode where font data is read from VGA BIOS data.
+- Add built-in VGA font.
+- Dispatch HUD calls directly (easier to maintain and should be faster).
+- Fix HUD partial transparency.
+- Refactor rescalers a bit.
+- Allow size-specific resizers.
+- Playdump fixes.
+- Dump resolution guesser.
+- Dumping tools manual.
+- Add real VGA timings.
+- Add support for BGA rev.5.
+
+Changes since JPC-RR Release 10.16:
+===================================
+- Fix streamtools build in makefile.
+
+Changes from JPC-RR Release 10.15 to JPC-RR Release 10.16:
+==========================================================
+- Fix some savestate/loadstate/ramdump operations from Lua.
+- Add command line option to access image maker mode.
+
+Changes from JPC-RR Release 10.14 to JPC-RR Release 10.15:
+==========================================================
+- Change hotkeys for some key events to be the keys themselves.
+- Add sendmessage command to Lua VM.
+- Change VGA offset for 8d2 to 0.
+- Fix popups if display resolution determination fails.
+- Backport: Make window member not superclass of PCControl.
+- Backport: Close the image backing files on image GC.
+- Backport: Prevent races in HUDRenderer.
+
+Changes from JPC-RR Release 10.13 to JPC-RR Release 10.14:
+==========================================================
+- Make build abort if ExceptionDefProcessor fails.
+- Add SYSTEM header to note the system movie is for.
+
+Changes from JPC-RR Release 10.12 to JPC-RR Release 10.13:
+==========================================================
+- Use new LDT when loading registers in jump to TSS.
+- Add optional fast instruction reloading on selfmodify.
+- Fix selfmodify mode to be actually saved to savestate.
+
+Changes from JPC-RR Release 10.11 to JPC-RR Release 10.12:
+==========================================================
+- Revamp the build system.
+- Add call to shutdown PCRunner from Lua.
+- Add keyboard queue length to generic hud.
+- Fix off-by-one in box rendering.
+
+Changes from JPC-RR Release 10.10 to JPC-RR Release 10.11:
+==========================================================
+- Fix subtitle time display.
+- Sightly better subtitle test.
+- Add tool to procude animated dumps.
+- Add script to produce ASCII font files.
+- Add makefile rule for mkdump.exe.
+- Add better help to mkdump.
+- Add color selection to subtitle script.
+- Fix priviledge checking in PMode.
+- Less spam about HALTs on insufficient CPLs.
+
+Changes from JPC-RR Release 10.9 to JPC-RR Release 10.10:
+=========================================================
+- Do immediate VGA output cycle on loadstate.
+- Fix LuaPlugin console.
+- Capabilities file I/O from Lua scripts.
+- Clean up root directory
+- Clean up VirtualKeyboard a bit.
+- Add kill command to do stack trace of all threads.
+
+Changes from JPC-RR Release 10.8 to JPC-RR Release 10.9:
+========================================================
+- Redesign author editor dialog.
+- Fix some savestate errors.
+- Add support for author nicknames.
+- Add ability for Lua to query movie length, rerecord count and headers.
+- Allow loading Lua plugin without GUI.
+- Allow action combos from extra menu.
+- Implement INT3_O16 and INTO_O16 in pmode.
+- Clean up Misc.parseString().
+- Clean up ConstantTableLayout.
+- Keyboard layouts support and new default layout.
+- Subtitle library.
+
+Changes from JPC-RR Release 10.7 to JPC-RR Release 10.8:
+========================================================
+- Don't truncate stack trace if menu invocation goes wrong.
+- Report inner exceptions in saved stack traces.
+- Set disk library in autoexec file, not from command line.
+- (try to) Keep focus on main window on savestate/loadstate.
+- Allow printing image info from JPC-RR commandline.
+- Fix bug in OPTION ABSOLUTE.
+
+Changes from JPC-RR Release 10.6 to JPC-RR Release 10.7:
+========================================================
+- Uncompressed saves.
+- If rename fails, try deleting file before retrying.
+- Probe if rename-over is possible and if not, fall back to copy&delete.
+- Do move to backup slot position just before committing the save.
+- Automatically resize PC monitor to correct size.
+- Make PC Control window to automatically resize to correct size.
+- If no arguments are specified, use defaults.
+
+Changes from JPC-RR Release 10.5 to JPC-RR Release 10.6:
+========================================================
+- Fix fast typing (keyhit) mode.
+- Rename assemble.bat to assemble.jpcrrinit as its not DOS batch file.
+
+Changes from JPC-RR Release 10.4 to JPC-RR Release 10.5:
+========================================================
+- Fix audio dumping lockup.
+
+Changes from JPC-RR Release 10.3 to JPC-RR Release 10.4:
+========================================================
+- Include luakernel.lua in release package.
+- Include BIOS/VGABIOS images in release package.
+
+Changes from JPC-RR Release 10.2 to JPC-RR Release 10.3:
+========================================================
+- Make release builds include proper main-class attribute so java -jar works.
+
+Changes from JPC-RR Release 10.1 to JPC-RR Release 10.2:
+========================================================
+- Dispatch ECI invocations to all plugins, not just the first.
+
+Changes from JPC-RR Release 10 to JPC-RR Release 10.1:
+======================================================
+- Fix save filehandle leak.
+- Add script for automated release building.
+
+Change from JPC-RR Release 9.1 to JPC-RR Release 10:
+====================================================
+- Don't call DMA transfer handler with empty remaining buffer.
+- Deprecate FPU lines, create FPUs via modules.
+- Take dump to pcm converter from unstable/soundcard (to fix serious
+  bugs in pcmdump to pcm conversion).
+- Eliminate some console spam.
+- Add FPU bit hack.
+- Warn about attempts to use FPU when not present.
+- Add VGA update hack bit.
+- Save ioportRegistered in DMAController.
+- Add I/O delay emulation.
+- Add information about images to movies/savestates.
+- New JRSR parser.
+- Fix crashes/misdraws in HUD code when drawing outside screen.
+- Allow screenshots from Lua.
+- Refactor image file creation.
+- Fix 880KiB standard disk format.
+- Rewrite JRSR parser again.
+- Graphical image importer.
+- Don't let Lua call methods on dead objects.
+- Mark internal state of dead Lua objects as garbage-collectable.
+- Remove some obsolete stuff (SoundTest and RAWToPNG)
+- Fix lots of warnings from GCJ.
+- Include build version in binaries.
+- Support hexadecimal constants in Lua.
+- Calculate audio filtering using doubles. Some filters are very
+  sensitive to numeric accuracy.
+- Fix incorrect stream ending when writing dumps.
+- Implement A16 REP(N)E {SCA,CMP}S[WD] in pmode.
+- Scan all devices when finding sound outputs.
+- Fix ECI with varargs.
+- Add configurable extra menu to PCControl and use it to replace PCStartStopTest.
+- Add wait for PC to stop function to Lua.
+- Update brief instructions.
+- Give import disk window proper layout.
+- Allow using file chooser in image import.
+- Fix bug in tree importer with recursive directories.
+- Allow INT 0.
+- Add VGA Hretrace emulation (needed by Commander Keen)
+- Check events better.
+- Add abilility to specify dumps using GUI.
+- Don't deadlock if video dumper is stopped.
+- Allow filtering and changing volume in rawtoaudio2.
+- Show keyboard LED status on vkeyboard.
+- If shift is held while selecting vkeyboard key, send two edges.
+- Sound card (FM and PCM) support.
+- Actually normalize coefficients in rawtorgb.
+- Add jpcrr.sendevent() for Lua.
+- Fix quicksave/quickload deadlock.
+- Fix video dumping crashing on first frame.
+- Don't wedge the emulator if filename to dump to can't be opened.
+- Save information about output channels to movie (makes automated encoding easier).
+- Revert keyboard interrupt mode since it is just broken.
+- Extramenu was missing send space, add it.
+- Mouse hw rerec support.
+- Do once-over on manual (add missing SoundCard and FMCard modules).
+
+Changes from JPC-RR Release 9 to JPC-RR Release 9.1:
+====================================================
+- Fix reconnect-terminate Lua deadlocks.
+- Don't crash Lua kernel if name of script to execute is invalid.
+
+Changes from JPC-RR Release 8 to JPC-RR Release 9:
+==================================================
+- Add plain text version of manual.
+- Add new hotkeys to startstoptest.
+- Add support for timed running into PCRunner.
+- Merge fixes in JPC-RR Release 8.1.
+- Revamp ECI to actually type calls.
+- Lua interpretter plugin.
+- Use true read length not requested length for return length
+  in BinaryInFile::read()
+- Support nullary BinaryInFile::read() [read entiere file].
+- Don't block PC in LuaPlugin before running script.
+- Fix PC halting vs. Lua prints.
+- HUD support framework.
+- New HUD primitive: Box.
+- New HUD primitive: Bitmap.
+- Print warnings on non-dispatchable ECI calls.
+- Lua script arguments support!
+- Text rendering library.
+- Don't crash in PCMonitor if w or h is 0.
+- Add method to get PC clock time.
+- Fix reconnect deadlock vs. Lua waiting for output hold.
+- Add way to query key status and simple generic HUD.
+- Allow querying VGA lock status from Lua.
+- Fix deadlock in PC attach wait vs. Lua VM termination.
+- Refactor generic HUD Lua script.
+- Support binary bitmaps and convert fonts to binary.
+- Special-case no-resize dump -> raw conversion.
+- Properly pass through exceptions in module loader.
+- Add method to dump long arrays to StatusDumper.
+- Average output sample over sample duration in dump->PCM conversion.
+- Write parameterless modules properly into initialization segment.
+- Joystick support.
+- Also compile modules by default.
+- Refactor joystick support.
+- Refactor Lua support.
+- Fix warnings when compiling Lua VM.
+- Support "Light amplification" in PCMonitor.
+- Allow screenshotting from PCMonitor.
+
+Changes from JPC-RR Release 8 to JPC-RR Release 8.1:
+====================================================
+- In loadstate code, doubles are 8 bytes each, not 4.
+
+Changes from JPC-RR Release 7 to JPC-RR Release 8:
+==================================================
+- Support CR, CRLF and NL line endings.
+- Don't crash in PCControl on invalid ECI calls.
+- Support memory read/write over ECI.
+- Make various JRSR utility classes implement Closeable.
+- Fix connector unsubscribing.
+- Record rerecord count for savestates.
+- Fix/Workaround VGA scrolling bug. Mario & Luigi now works.
+- Fix PCSpeaker transition edges to be sharp.
+- Optionally Load and default save relative event timing.
+- Add plugin to display current time.
+- Add crude raw streamdump to raw RGB converter.
+- Replace rounddown resizer with Lanzcos resizer.
+- Add raw audio stream to raw audio file converter.
+- Add raw audio mixer.
+- Add raw audio digital FIR/IIR filter.
+- Implement micro-op 125 (PUSHA) in pmode.
+- Support multiple resizing algorithms in rawtorgb
+- Add movie length to time display.
+- Force UTF-8 in compile scripts.
+- Don't trucate stack traces if plugin instantiation throws
+  error or unknown exception.
+
+Changes from JPC-RR Release 6 to JPC-RR Release 7:
+==================================================
+- Mark that some fields are not saved.
+- Refactor menus in PCControl.
+- Refactor menus even more by adding profiles to menu manager.
+- Use comboboxes instead of textboxes to prompt images.
+- Give next event time when clock is processed.
+- Support INT1 in real mode.
+- Pretty-print time sequence values on PC stop.
+- Support moving windows via external command interface.
+- Add tools for manipulating video streams.
+- Give reliable retracing signal from VGA.
+- Add utility to perform image letter boxing.
+- Try to backup savestate before overwriting.
+- Add makefile for stream tools and add brief description for each.
+- Refactor writing component encoding lines.
+- Add ability to edit run authors from GUI.
+- Improve exception reporting.
+- Add ability to force load savestate as movie.
+- Fix keyboard Pause/Printscreen timing.
+
+Changes from JPC-RR Release 6 to JPC-RR Release 6.1:
+====================================================
+- Fix event stream truncation.
+
+Changes from JPC-RR Release 6.1 to JPC-RR Release 6.2:
+======================================================
+- Fix reporting exceptions from dumpers.
+- Don't crash when dumping CD-ROM images.
+
+Changes from JPC-RR Release 5 to JPC-RR Release 6:
+==================================================
+- Rearrange Snapshot menu.
+- Make traps in interface independent from PC.
+- Fix setting traps using external commands interface.
+- Remove RunnerPlugin. External PC start/stop is via external commands interface.
+- Get rid of image library index files.
+- Input PC parameters via dialog.
+- Remove notifyArguments().
+- Give plugins via new command loop.
+- Allow using external command interface from command loop.
+- Obtain event modulo timing from callback, not from event itself.
+- Add external command interface command to send an event.
+- Implement support for disk switching.
+- Support naming disks.
+- Support autoexec scripts.
+- Delete DiskImageChooser as unused.
+- Support floppy write protect.
+
+Changes from JPC-RR Release 4 to JPC-RR Release 5:
+==================================================
+- Move classes to more logical places.
+- A16/A32 doesn't control stack access size
+- Allow PNG saving to occur in parallel to saving next frame.
+- Add timebase data to audio blocks for time linearization.
+- Synchronize shutdown of audio and video dumpers to shutdown of main PC
+- Support variable framerate and splice audio segments properly.
+- Add test module for audio dumping.
+- Don't deadlock in PCRunner if savestate load fails.
+- Pop up error dialog on unexpected exception.
+- Add method to wait until all connector subscribers have released.
+- Squash whitespace errors.
+- Move dialog related code from JPCApplication to Misc.
+- Support offsets in RAWAudioDumper
+- Fix VirtualKeyboard shutdown deadlock
+- Support raw format dumps in PNGDumper.
+- Move PNG dumping to external utility and rename PNGDumper -> RAWVideoDumper.
+- Optimize save and loadstate a bit.
+- Show time taken by loadstate and savestate.
+- Optimize loadstate by reading data out internal buffer.
+- Optimize savestate by writing data to internal buffer.
+- Display total savestate load/save time.
+
+Changes from JPC-RR Release 3 to JPC-RR Release 4:
+==================================================
+- Fix broken BIOS image making.
+- Add comments sections to images and record tree info to comments.
+	Handy to know how to get the ID to match in case someone created the filesystem
+	from tree.
+- Collapse VirtualClock to Clock.
+- Refactor FPU core to be inside FPU class.
+- Merge real and protected mode FPU emulation code.
+- Remvoe unneeded stuff from top-level FPU class.
+- Refactor FPU emulation.
+	Support CPU without FPU and support EM, TS, MP and ET bits.
+- Make FPU emulator optinal/configurable.
+- Fix CLTS to reset CR0 bit 3, not CR3 bit 2.
+- Make RTC update cycle to be 244 microseconds instead of 10 milliseconds.
+- Fix PUSHx/POPx to respect SS size attribute in all modes.
+- Cache SS size in real mode.
+- Don't bomb out with uncaught exception if library is missing.
+
+Changes from JPC-RR Release 2 to JPC-RR Release 3:
+==================================================
+- Merge user manual and savestate docs, write devel docs and convert all that to Lyx.
+- Try to support auto-init DMA (for soundcard).
+- Update Changelog to include stuff before r1.
+- Add external commands interface to control plugins from others
+- Bump PNG counter from 6 digits to 12 so all movies can be dumped.
+- Don't allow using scancodes 0, 84 and 198.
+- Print usage on command line errors for ImageMaker.
+
+Changes from JPC-RR Release 1 to JPC-RR Release 2:
+==================================================
+- Optimize disk ID calculation
+	Optimize disk ID calculation by special-casing the handling of all-zero blocks in hash
+	plus doing the necessary modifications in order to exploit that special case. In case
+	of used space being small in comparison to total space, this cuts the time to compute
+	the disk ID by HALF.
+- Fix bug in assigning audio output IDs in presence of same module loaded multiple times
+- Warn if audio input ID in raw audio dumper is invalid
+
+Changes from JPC to JPC-RR Release 1:
+=====================================
+- Remove background compiler
+	One really doesn't need the nondeterminism JIT brings.
+- Remove applet code and debugger
+	This is not going to run as applet and debugger isn't something I would want to keep
+	up to date.
+- Remove ethernet and serial port emulation
+	Multi-machine emulation is nightmare to make sync.
+- Make TSC exact number of instructions executed, not guess based on frequency
+- Synchronize all timing to CPU
+- Replace all block device types with GenericBlockDevice
+	GenericBlockDevice can handle all types of block backed by DiskImage, and DiskImage
+	can handle COW (Copy-On-Write).
+- Don't allow save/loadstate on running PC
+	Savestating on running PC is racy and produces unusable savestate.
+- Variable CPU speed/memory size/BIOS image support
+- Add VGA retrace start/stop traps and timed traps
+	This is frame / time advance mecanism.
+- Textual status dump
+	Textual status dump is powerful tool when debugging desyncs.
+- Implement new savestate mechanism and remove the old
+	The old mechanism just didn't cut it. New mechanism is brute-force but works.
+- Video dumping support
+	Support dumping video to series of PNG files
+- Add tools for making image files
+- Image library code
+	Needed images are searched via image library.
+- Handle triple faults
+	Reboot PC on triple fault instead of crashing the emulator core.
+- Enable start/stop as apporiate
+- Don't hang the UI during savestate and related operations
+- Remove mouse input support
+	To be reintroduced later
+- Create PC from GUI, not before it
+- Allow fast exits out of CPU emulator
+- Fix the "11 micro-ops" bug.
+- Dedicated timer priority queue class
+	The standard one from java.util.<foo> just isn't deterministic enough.
+- Use stderr instead of logger
+	Makes nicer-looking console output.
+- Support dumping emulated RAM
+- Plugins and modules support
+	These are for future extensions, so devices can be added without breaking timing.
+- Move previous JPCApplication/PCMonitor code to plugins
+- Display errors as dialogs if GUI available, on console if not
+- Event recording/playback code
+- Audio dumping support + PCSpeaker audio output support

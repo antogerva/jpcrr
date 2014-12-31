@@ -1,0 +1,10 @@
+This disk image are intended for use with JPC-RR.  It is a version of
+FreeDOS distributed with JPC; the original file can be found in the source
+code of JPC at http://javapc.sourceforge.net.  Both FreeDOS and JPC are
+available under ther terms of the GNU General Public License v2 (included
+for your perusal).
+
+For use with JPC-RR, place this image into the disklibrary directory in
+your JPC-RR directory (if it does not exist, either create it or start JPC-RR,
+which will automatically create it).
+

@@ -1,0 +1,203 @@
+#!/usr/bin/env lua
+
+demappings = {};
+
+for k, v in ipairs(arg) do
+	demap = string.match(v, "ignore=([0-9]+)");
+	if demap then
+		demap = tonumber(demap);
+		if not demap then
+			error("Bad ignore");
+		end
+		table.insert(demappings, demap);
+	end
+end
+
+add_keyboard_map_entry = function(keynum, raw, shifted)
+	if type(raw) == "string" then
+		raw = string.byte(raw);
+	end
+	if type(shifted) == "string" then
+		shifted = string.byte(shifted);
+	end
+	if raw then
+		keyboard_map[raw] = {keynum, keynum};
+		keyboard_map[raw + 128] = {56, keynum, keynum, 56};
+		if raw >= 64 and raw <= 95 then
+			keyboard_map[raw - 64] = {29, keynum, keynum, 29};
+			keyboard_map[raw + 64] = {56, 29, keynum, keynum, 29, 56};
+		end
+	end
+	if shifted then
+		keyboard_map[shifted] = {54, keynum, keynum, 54};
+		keyboard_map[shifted + 128] = {56, 54, keynum, keynum, 54, 56};
+		if shifted >= 64 and shifted <= 95 then
+			keyboard_map[shifted - 64] = {29, 54, keynum, keynum, 54, 29};
+			keyboard_map[shifted + 64] = {56, 54, 29, keynum, keynum, 29, 54, 56};
+		end
+	end
+end
+
+-- Specials.
+special_keys = {};
+special_keys["1"] = {2, 2};
+special_keys["2"] = {3, 3};
+special_keys["3"] = {4, 4};
+special_keys["4"] = {5, 5};
+special_keys["5"] = {6, 6};
+special_keys["6"] = {7, 7};
+special_keys["7"] = {8, 8};
+special_keys["8"] = {9, 9};
+special_keys["9"] = {10, 10};
+special_keys["0"] = {11, 11};
+special_keys["A"] = {63, 63};
+special_keys["B"] = {66, 66};
+special_keys["C"] = {15, 15};
+special_keys["r"] = {28, 28};
+special_keys["n"] = {28, 28};
+special_keys["D"] = {95, 95};
+
+
+-- Keyboard mapping table
+keyboard_map = {};
+add_keyboard_map_entry(1);				-- ESCAPE
+add_keyboard_map_entry(2, "1", "!");
+add_keyboard_map_entry(3, "2", "@");
+add_keyboard_map_entry(4, "3", "#");
+add_keyboard_map_entry(5, "4", "$");
+add_keyboard_map_entry(6, "5", "%");
+add_keyboard_map_entry(7, "6", "^");
+add_keyboard_map_entry(8, "7", "&");
+add_keyboard_map_entry(9, "8", "*");
+add_keyboard_map_entry(10, "9", "(");
+add_keyboard_map_entry(11, "0", ")");
+add_keyboard_map_entry(12, "-", "_");
+add_keyboard_map_entry(13, "=", "+");
+add_keyboard_map_entry(14);				-- BACKSPACE
+add_keyboard_map_entry(15);				-- TABULATOR
+add_keyboard_map_entry(16, "q", "Q");
+add_keyboard_map_entry(17, "w", "W");
+add_keyboard_map_entry(18, "e", "E");
+add_keyboard_map_entry(19, "r", "R");
+add_keyboard_map_entry(20, "t", "T");
+add_keyboard_map_entry(21, "y", "Y");
+add_keyboard_map_entry(22, "u", "U");
+add_keyboard_map_entry(23, "i", "I");
+add_keyboard_map_entry(24, "o", "O");
+add_keyboard_map_entry(25, "p", "P");
+add_keyboard_map_entry(26, "[", "{");
+add_keyboard_map_entry(27, "]", "}");
+add_keyboard_map_entry(28);				-- ENTER
+add_keyboard_map_entry(29);				-- Left CONTROL
+add_keyboard_map_entry(30, "a", "A");
+add_keyboard_map_entry(31, "s", "S");
+add_keyboard_map_entry(32, "d", "D");
+add_keyboard_map_entry(33, "f", "F");
+add_keyboard_map_entry(34, "g", "G");
+add_keyboard_map_entry(35, "h", "H");
+add_keyboard_map_entry(36, "j", "J");
+add_keyboard_map_entry(37, "k", "K");
+add_keyboard_map_entry(38, "l", "L");
+add_keyboard_map_entry(39, ";", ":");
+add_keyboard_map_entry(40, "'", "\"");
+add_keyboard_map_entry(41, "`", "~");
+add_keyboard_map_entry(42);				-- LEFT SHIFT
+add_keyboard_map_entry(43, "\\", "|");
+add_keyboard_map_entry(44, "z", "Z");
+add_keyboard_map_entry(45, "x", "X");
+add_keyboard_map_entry(46, "c", "C");
+add_keyboard_map_entry(47, "v", "V");
+add_keyboard_map_entry(48, "b", "B");
+add_keyboard_map_entry(49, "n", "N");
+add_keyboard_map_entry(50, "m", "M");
+add_keyboard_map_entry(51, ",", "<");
+add_keyboard_map_entry(52, ".", ">");
+add_keyboard_map_entry(53, "/", "?");
+add_keyboard_map_entry(54);				-- RIGHT SHIFT
+add_keyboard_map_entry(55);				-- KEYPAD MULTIPLY
+add_keyboard_map_entry(56);				-- LEFT ALT
+add_keyboard_map_entry(57, " ");
+add_keyboard_map_entry(58);				-- CAPS LOCK
+add_keyboard_map_entry(59);				-- F1
+add_keyboard_map_entry(60);				-- F2
+add_keyboard_map_entry(61);				-- F3
+add_keyboard_map_entry(62);				-- F4
+add_keyboard_map_entry(63);				-- F5
+add_keyboard_map_entry(64);				-- F6
+add_keyboard_map_entry(65);				-- F7
+add_keyboard_map_entry(66);				-- F8
+add_keyboard_map_entry(67);				-- F9
+add_keyboard_map_entry(68);				-- F10
+add_keyboard_map_entry(69);				-- NUM LOCK
+add_keyboard_map_entry(70);				-- SCROLL LOCK
+add_keyboard_map_entry(71);				-- KP7
+add_keyboard_map_entry(72);				-- KP8
+add_keyboard_map_entry(73);				-- KP9
+add_keyboard_map_entry(74);				-- KEYPAD MINUS
+add_keyboard_map_entry(75);				-- KP4
+add_keyboard_map_entry(76);				-- KP5
+add_keyboard_map_entry(77);				-- KP6
+add_keyboard_map_entry(78);				-- KEYPAD PLUS
+add_keyboard_map_entry(79);				-- KP1
+add_keyboard_map_entry(80);				-- KP2
+add_keyboard_map_entry(81);				-- KP3
+add_keyboard_map_entry(82);				-- KP0
+add_keyboard_map_entry(83);				-- KEYPAD DECIMAL SIGN
+add_keyboard_map_entry(84);				-- RESERVED BY EMULATOR
+add_keyboard_map_entry(85);				-- UNKNOWN
+add_keyboard_map_entry(86);				-- UNKNOWN
+add_keyboard_map_entry(87);				-- F11
+add_keyboard_map_entry(88);				-- F12
+add_keyboard_map_entry(89);				-- UNKNOWN
+add_keyboard_map_entry(90);				-- UNKNOWN
+add_keyboard_map_entry(91);				-- UNKNOWN
+add_keyboard_map_entry(92);				-- UNKNOWN
+add_keyboard_map_entry(93);				-- UNKNOWN
+add_keyboard_map_entry(94);				-- UNKNOWN
+add_keyboard_map_entry(95);				-- UNKNOWN
+
+-- Ignore ENTER.
+keyboard_map[0x0A] = {};
+
+-- Demap unwanted keys.
+for k, v in ipairs(demappings) do
+	keyboard_map[v] = {};
+end
+
+write = function(tab)
+	local k, v;
+	for k, v in ipairs(tab) do
+		print(v);
+	end
+end
+
+special_escape = false;
+while true do
+	charo = io.stdin:read(1);
+	if special_escape then
+		if charo == "\\" then
+			-- Handle as ordinary.
+			char = string.byte(charo);
+			if not keyboard_map[char] then
+				error(string.format("Unknown character 0x%02X (not found in keyboard map)", char));
+			end
+			write(keyboard_map[char]);
+		elseif special_keys[charo] then
+			write(special_keys[charo]);
+		else
+			error("Bad special '" .. charo .. "'");
+		end
+		special_escape = false;
+	elseif charo == "\\" then
+		special_escape = true;
+	else
+		if not charo then
+			break;
+		end
+		char = string.byte(charo);
+		if not keyboard_map[char] then
+			error(string.format("Unknown character 0x%02X (not found in keyboard map)", char));
+		end
+		write(keyboard_map[char]);
+	end
+end

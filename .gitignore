@@ -1,0 +1,13 @@
+*~
+*StackTrace*.text
+/.git
+/.settings/
+.classpath
+.project
+/bin/
+/target/
+/screenshot/
+/movie/
+/dumpTools/
+/tools/
+/stacktrace/

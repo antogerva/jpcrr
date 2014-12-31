@@ -1,0 +1,5 @@
+*.lyx binary
+manual.txt binary
+TestUTF binary
+jill.modifications -diff
+ExceptionDefProcessor.java export-subst

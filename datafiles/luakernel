@@ -1,0 +1,1659 @@
+--
+-- Copyright 2009-2010 Ilari Liusvaara
+--
+-- Licenced under GNU GPL v2.
+--
+
+-- Exported tables:
+--	- args
+--		Contains user-level arguments.
+--
+-- Exported functions:
+--	- All lua standard functions in tables main, "coroutine", "string" and "table".
+--	- modulus_split(number num, number...)
+--		Returns quotents and quotent remainders of number divided by given dividers.
+--		The number of results returned is equal to number of numbers passed. The
+--		dividers must be in decreasing order and all dividers must be nonzero and
+--		should be >1.
+--	- assert(object ret, object err)
+--		If ret is considered true, return ret. Otherwise raise err as error. Exception
+--		if err is nil too, then ret is returned anyway.
+--	- bit.none(number...)
+--		Returns 48-bit number that has those bits set that are set in none of its
+--		arguments.
+--	- bit.any(number...)
+--		Returns 48-bit number that has those bits set that are set in any of its
+--		arguments.
+--	- bit.parity(number...)
+--		Returns 48-bit number that has those bits set that are set in even number
+--		of its arguments.
+--	- bit.any(number...)
+--		Returns 48-bit number that has those bits set that are set in all of its
+--		arguments.
+--	- bit.lshift(number num, number shift)
+--		Returns 48 rightmost bits of num shifted by shift places left. Going outside
+--		shift range 0-47 produces unpredicatable results.
+--	- bit.rshift(number num, number shift)
+--		Returns 48 rightmost bits of num shifted by shift places right. Going outside
+--		shift range 0-47 produces unpredicatable results.
+--	- bit.arshift(number num, number shift)
+--		Returns 48 rightmost bits of num shifted by shift places right and bit 47
+--		value copied to all incoming bits. Going outside shift range 0-47 produces
+--		unpredicatable results.
+--	- bit.add(number...)
+--		Returns sum of all passed numbers modulo 2^48.
+--	- bit.addneg(number...)
+--		Returns 0 minus sum of all passed numbers modulo 2^48.
+--	- bit.addalt(number...)
+--		Returns sum of odd arguments (first is odd) minus sum of even arguments modulo
+--		 2^48.
+--	- bit.rol(number num, number shift)
+--		Returns 48 rightmost bits of num rotated by shift places left. Going outside
+--		shift range 0-47 produces unpredicatable results.
+--	- bit.ror(number num, number shift)
+--		Returns 48 rightmost bits of num rotated by shift places right. Going outside
+--		shift range 0-47 produces unpredicatable results.
+--	- bit.bswap2(number num)
+--		Returns 16 rightmost bits of num byte-swapped.
+--	- bit.bswap3(number num)
+--		Returns 24 rightmost bits of num byte-swapped.
+--	- bit.bswap4(number num)
+--		Returns 32 rightmost bits of num byte-swapped.
+--	- bit.bswap5(number num)
+--		Returns 40 rightmost bits of num byte-swapped.
+--	- bit.bswap6(number num)
+--		Returns 48 rightmost bits of num byte-swapped.
+--	- bit.signextend(number num, number bitnum)
+--		Copy bitnum'th bit of num to all higher bits of num and return result. Going
+--		outside bitnum range of 0-47 produces unpredictable results.
+--	- bit.tosigned(number num, number bitnum)
+--		Mask off bitnum'th bit and all higher bits. If bitnum'th bit of num was set,
+--		perform 2s complement on number and negate the result.
+--	- bit.tohex(number num)
+--		Returns hexadecimal string representation of number.
+--	- jpcrr.wait_event()
+--		Waits for event. Returns event type and extra message (if present). Event
+--		Types are "lock", "stop", "attach" and "message". Note that if you get event
+--		of type "lock", you are now in frame hold.
+--	- jpcrr.poll_event()
+--		Same as wait_event(), but does not wait for event to occur (returns nil if there
+--		is no event).
+--	- jpcrr.in_frame_hold()
+--		Returns true if in frame hold, false otherwise.
+--	- jpcrr.keypressed(number key)
+--		Return true if key is pressed, else false.
+--	- jpcrr.keypressed_edge(number key)
+--		Return true if key is pressed at input edge, else false.
+--	- jpcrr.release_vga()
+--		Allow VGA to exit frame hold mode. Wait for frame hold first.
+--	- jpcrr.shutdown_emulator()
+--		Shutdown the entiere emulator immediately (graceful shutdown, PCRunner only).
+--	- jpcrr.hud.left_gap(number flags, number gap)
+--		Set left gap for HUD. If flags has bit 0 (1) set, draw on screen, if bit
+--		1 (2) is set, dump to video dump.
+--	- jpcrr.hud.right_gap(number flags, number gap)
+--		Set right gap for HUD. If flags has bit 0 (1) set, draw on screen, if bit
+--		1 (2) is set, dump to video dump.
+--	- jpcrr.hud.top_gap(number flags, number gap)
+--		Set top gap for HUD. If flags has bit 0 (1) set, draw on screen, if bit
+--		1 (2) is set, dump to video dump.
+--	- jpcrr.hud.bottom_gap(number flags, number gap)
+--		Set bottom gap for HUD. If flags has bit 0 (1) set, draw on screen, if bit
+--		1 (2) is set, dump to video dump.
+--	- jpcrr.hud.white_solid_box(number flags, number x, number y, number w, number h)
+--		Draw with solid opaque box.
+--	- jpcrr.hud.box(number flags, number x, number y, number w, number h, number linethick,
+--			number lineRed, number lineGreen, number lineBlue, number lineAlpha,
+--			number fillRed, number fillGreen, number fillBlue, number fillAlpha)
+--		Draw box with specified size, border line thickness, line color and fill color.
+--	- jpcrr.hud.circle(number flags, number x, number y, number r, number linethick,
+--			number lineRed, number lineGreen, number lineBlue, number lineAlpha,
+--			number fillRed, number fillGreen, number fillBlue, number fillAlpha)
+--		Draw circle with specified size, border line thickness, line color and fill color.
+--	- jpcrr.hud.bitmap(number flags, number x, number y, string bmap,
+--			number fgRed, number fgGreen, number fgBlue, number fgAlpha,
+--			number bgRed, number bgGreen, number bgBlue, number bgAlpha)
+--		Draw bitmap with specified foreground color and background color.
+--	- jpcrr.hud.bitmap_binary(number flags, number x, number y, string bmap,
+--			number fgRed, number fgGreen, number fgBlue, number fgAlpha,
+--			number bgRed, number bgGreen, number bgBlue, number bgAlpha)
+--		Draw binary bitmap with specified foreground color and background color.
+--	- jpcrr.hud.changen(number flags, number x, number y, string text,
+--			number fgRed, number fgGreen, number fgBlue, number fgAlpha,
+--			number bgRed, number bgGreen, number bgBlue, number bgAlpha,
+--                      boolean multiline)
+--		Output string using chargen.
+--	- jpcrr.events.count()
+--		Return current event count. Nil if no PC.
+--	- jpcrr.events.current_sequence()
+--		Return sequence number of next event (event sequence numbers are 0-based). Nil if
+--		no PC, -1 if at end of movie.
+--	- jpcrr.events.by_sequence(number seq)
+--		Return array for specified event. Nil if no PC, empty array if not valid sequence
+--		number. Otherwise, first element of array is timestamp (numeric), the second is
+--		event class and rest are the arguments.
+--	- jpcrr.component_encode(table components)
+--		Return component encoding for specified components.
+--	- jpcrr.component_decode(string line)
+--		Return component decoding for specified line, nil/nil if it doesn't encode
+--		anything, nil/string if parse error occurs (the error is the second return).
+--	- jpcrr.save_state(string name)
+--		Savestate into specified file. Returns name used.
+--	- jpcrr.save_movie(string name)
+--		Save movie into specified file. Returns name used.
+--	- jpcrr.load_state_normal(string name)
+--		Load specified savestate. Returns name used.
+--	- jpcrr.load_state_preserve_events(string name)
+--		Load specified savestate, preserving events. Returns name used.
+--	- jpcrr.load_state_movie(string name)
+--		Load specified savestate as movie. Returns name used.
+--	- jpcrr.assemble()
+--		Open system settings dialog.
+--	- jpcrr.change_authors()
+--		Open change authors dialog.
+--	- jpcrr.exit = function()
+--		Exit the Lua VM.
+--	- jpcrr.ram_dump(string name, boolean binary)
+--		Dump PC memory to specified file. If binary is true, dump is binary, otherwise
+--		textual hexadecimal dump.
+--	- jpcrr.write_byte(number addr, number value)
+--		Write byte to specified physical address.
+--	- jpcrr.write_word(number addr, number value)
+--		Write word to specified physical address (little endian).
+--	- jpcrr.write_dword(number addr, number value)
+--		Write dword to specified physical address (little endian).
+--	- jpcrr.read_byte(number addr)
+--		Return byte from specified physical address.
+--	- jpcrr.read_word(number addr)
+--		Return word from specified physical address (little endian).
+--	- jpcrr.read_dword(number addr)
+--		Return dword from specified physical address (little endian).
+--	- jpcrr.read_byte_signed(number addr)
+--		Return signed byte from specified physical address.
+--	- jpcrr.read_word_signed(number addr)
+--		Return signed word from specified physical address (little endian).
+--	- jpcrr.read_dword_signed(number addr)
+--		Return signed dword from specified physical address (little endian).
+--	- jpcrr.timed_trap(number nsecs)
+--		Set trap after specified number of nanoseconds. Use nil as nsecs to disable.
+--	- jpcrr.vretrace_start_trap(boolean is_on)
+--		Set trap on vretrace start on/off.
+--	- jpcrr.vretrace_end_trap(boolean is_on)
+--		Set trap on vretrace end on/off.
+--	- jpcrr.bios_kbd_trap(boolean is_on)
+--		Set trap on BIOS kbd on/off.
+--	- jpcrr.pc_start()
+--		Start PC execution.
+--	- jpcrr.pc_stop()
+--		Stop PC execution.
+--	- jpcrr.set_pccontrol_pos(number x, number y)
+--		Set position of PCControl window.
+--	- jpcrr.set_luaplugin_pos(number x, number y)
+--		Set position of LuaPlugin window.
+--	- jpcrr.set_pcmonitor_pos(number x, number y)
+--		Set position of PCMonitor window.
+--	- jpcrr.set_pcstartstoptest_pos(number x, number y)
+--		Set position of PCStartStopTest window.
+--	- jpcrr.set_virtualkeyboard_pos(number x, number y)
+--		Set position of VirtualKeyboard window.
+--	- jpcrr.stringlessthan(String x, String y)
+--		Return true if x is before y in codepoint lexical order, otherwise false.
+--	- jpcrr.screenshot(boolean include_hud)
+--		Take screen shot (Requires monitor). If include_hud is true, include HUD
+--		(as shown on screen). Note that this should only be called during frame
+--		hold or results are pretty much undefined.
+--	- jpcrr.sendevent(string class, string/number...)
+--		Sends specified event.
+--	- jpcrr.sendevent_lowbound(number lowbound, string class, string/number...)
+--		Sends specified event with specified time low bound.
+--	- jpcrr.register_redraw_function(function)
+--		This function is called every time screen is redrawn. It is called with
+--		VGA lock held and that lock is automatically released after call. If this
+--		function has been registered, no lock events will be generated.
+--	- jpcrr.register_message_function(function)
+--		This function is called with message as parameter every time message is
+--		received. Suppresses message events.
+--	- jpcrr.register_attach_function(function)
+--		This function is called every time attach is
+--		received. Suppresses attach events.
+--	- jpcrr.register_stop_function(function)
+--		This function is called every time stop is
+--		received. Suppresses stop events.
+--	- jpcrr.register_uiaction_function(function)
+--		This function is called with widget name as parameter every time
+--		UI action event is received. Suppresses ui action events.
+--	- jpcrr.stop_and_execute(function)
+--		Stop PC execution and call specified function after PC has stopped
+--		fully. Note that only handler functions receive events until this
+--		returns.
+--	- jpcrr.hostmemory.read()
+--		Returns contents of host memory.
+--	- jpcrr.hostmemory.write(string contents)
+--		Overwrites host memory with specified string.
+--	- jpcrr.status()
+--		Returns table of various status indications (if practicular status is not available, it is nil):
+--		running: true if PC is running, otherwise false.
+--		time: Current clock time in nanoseconds.
+--		resolution_x: Current VGA resolution X component (0 or -1 if no valid signal).
+--		resolution_y: Current VGA resolution Y component (0 or -1 if no valid signal).
+--		frame: Frame VGA is on (number of positive edges of retrace signal).
+--		movie_length: Movie length in nanoseconds.
+--		movie_rerecords: Rerecord count in last loaded movie.
+--		movie_headers: Various non-system headers of last loaded movie.
+--		project_id: Project ID of last loaded movie.
+--		vga_scrolls: Number of times VGA hardware scrolling has been used.
+--		vga_retraces_seen: Number of VGA vretrace positive edges seen by software.
+--		irq0_dispatched: Number of IRQ0s dispatched (all of those may not be delivered).
+--		irq0_frequency: IRQ0 frequency divider (base frequency is 1193182Hz).
+--		keyboard_leds_valid: True if keyboard LED data is valid, false otherwise.
+--		keyboard_num_lock: Status of keyboard num lock.
+--		keyboard_caps_lock: Status of keyboard num lock.
+--		keyboard_scroll_lock: Status of keyboard num lock.
+--		mouse_dx_pending: mouse x movement amount pending in queue.
+--		mouse_dy_pending: mouse y movement amount pending in queue.
+--		mouse_dz_pending: mouse z movement amount pending in queue.
+--		mouse_button_1: Status of mouse button 1.
+--		mouse_button_2: Status of mouse button 2.
+--		mouse_button_3: Status of mouse button 3.
+--		mouse_button_4: Status of mouse button 4.
+--		mouse_button_5: Status of mouse button 5.
+--		joystick_ax: Joystick A X-axis hold duration.
+--		joystick_ay: Joystick A Y-axis hold duration.
+--		joystick_bx: Joystick B X-axis hold duration.
+--		joystick_by: Joystick B Y-axis hold duration.
+--		joystick_aa: Joystick A button A.
+--		joystick_ab: Joystick A button B.
+--		joystick_ba: Joystick B button A.
+--		joystick_bb: Joystick B button B.
+--
+--	I/O functions have the following conventions. If function returns any real data, the first
+--	return value returns this data or is nil. Otherwise first return value is true or false.
+--	If first return value is nil or false, then the second return value gives textual error
+--	message for failed operation, or is nil if EOF occured before anything was read.
+--
+--	Unlink, rename and mkdir don't follow this pattern. They just return true/false to signal
+--	success or failure.
+--
+--	Specifying nil as name of file results random filename being used (it even works with unlink,
+--	mkdir, rename and read-only access, but doesn't make any sense there).
+--
+--	Specifying empty filename prompts for file (doesn't work with mkdir, rename nor unlink). Use
+--	'/<title>' to specify title for prompt dialog.
+--
+--	Class: BinaryFile:
+--		Binary file for RO or RW access. Methods are as follows:
+--		- name()
+--			Return name of file.
+--		- length()
+--			Return length of file.
+--		- set_length(number length)
+--			Truncate file to specified length
+--		- read(number offset, number length)
+--			Read up to length bytes from offset.
+--		- write(number offset, string content)
+--			Write content to specified offset.
+--		- close()
+--			Close the file.
+--	Class: BinaryInput:
+--		Binary file for sequential input. Methods are as follows:
+--		- name()
+--			Return name of file.
+--		- four_to_five()
+--			Return BinaryInput that is four to five decoding of this stream.
+--		- text()
+--			Return stream as TextInput.
+--		- inflate()
+--			Return BinaryInput that is inflate of this stream.
+--		- read(number bytes)
+--			Read up to bytes bytes from file.
+--		- read()
+--			Read the entiere file at once.
+--		- close()
+--			Close the file.
+--		Character set for binary files is Latin-1.
+--
+--	Class: BinaryOutput:
+--		Binary file for sequential output. Methods are as follows:
+--		- name()
+--			Return name of file.
+--		- four_to_five()
+--			Return BinaryOutput that writes four to five encoded output to this stream.
+--		- text()
+--			Return stream as TextOutput.
+--		- deflate()
+--			Return BinaryOutput that writes deflate output to this stream.
+--		- write(string content)
+--			Write string to file.
+--		- close()
+--			Close the file.
+--		Character set for binary files is Latin-1.
+--
+--	Class: TextInput:
+--		- name()
+--			Return name of file.
+--		- read()
+--			Read line from file.
+--		- read_component()
+--			Read next componented line into array.
+--		- lines()
+--			Line iterator function.
+--		- close()
+--			Close the file.
+--	Character set for text files is UTF-8.
+--
+--	Class: TextOutput:
+--		- name()
+--			Return name of file.
+--		- write(string line)
+--			Write line line to file.
+--		- write_component(table components)
+--			Write componented line.
+--		- close()
+--			Close the file.
+--		Character set for text files is UTF-8.
+--
+--	Class ArchiveIn:
+--		- member(string name)
+--			Open substream for member name. The methods are the same as for io.opentextin.
+--		- member_binary(string name)
+--			Open binary (four to five) substream for member name. The methods are the same as
+--			for io.openbinaryin.
+--		- close()
+--			Close the file. Any opened substreams are invalidated.
+--		- member_list()
+--			Return table listing all members of archive (sorted by name).
+--	Class ArchiveOut:
+--		- member(string name)
+--			Open substream for member name. The methods are the same as for io.opentextout. Note that
+--			previous member must be closed before next can open.
+--		- member_binary(string name)
+--			Open binary (four to five) substream for member name. The methods are the same as
+--			for io.openbinaryout. Note that previous substream must be closed before next can open.
+--		- commit()
+--			Commit the file. No substream may be open. Closes the file.
+--		- rollback()
+--			Rollback the file. No substream may be open. Closes the file.
+--
+--	- io.open(string name, string mode) -> BinaryFile
+--		Open file named @name in specified mode. The mode can be 'r' (read only) or 'rw' (read and
+--		write).
+--	- io.open_read(string name) -> BinaryInput
+--		Open file named @name as binary input stream.
+--	- io.open_write(string name) -> BinaryOutput
+--		Open file named @name as binary input stream.
+--	- io.open_arch_read(string name) -> ArchiveIn
+--		Open file named @name as input archive.
+--	- io.open_arch_write(string name) -> ArchiveOut
+--		Open file named @name as output archive.
+--	- io.mkdir(string name)
+--		Create directory name. Returns name created on success, nil on failure.
+--	- io.unlink(string name)
+--		Delete file/directory name. Returns name deleted on success, nil on failure.
+--	- io.rename(string old, string new)
+--		Rename file old -> new. Returns old, new on success, nil on failure.
+--	- io.transform.text()
+--		Returns function that calls text() method of its parameter.
+--	- io.transform.four_to_five()
+--		Returns function that calls four_to_five() method of its parameter.
+--	- io.transform.deflate()
+--		Returns function that calls deflate() method of its parameter.
+--	- io.transform.inflate()
+--		Returns function that calls inflate() method of its parameter.
+--	- io.dotransform(object obj, function...)
+--		Call specified functions on specified object. If any function fails (first argument nil
+--		or false), call close method on preceeding object. Otherwise call specified functions
+--		chained left to right and return the result.
+--	- io.dotransform2(object obj, string err, function...)
+--		Similar to dotransform except if obj is nil or false, returns obj, err.
+--	- jpcrr.random.nextBoolean()
+--		Returns random boolean.
+--	- jpcrr.random.nextBytes(number bytes)
+--		Returns random string of bytes [0,255], bytes chars in length.
+--	- jpcrr.random.nextDouble()
+--		Returns random double [0,1)
+--	- jpcrr.random.nextFloat()
+--		Returns random float [0,1)
+--	- jpcrr.random.nextGaussian()
+--		Returns random number according to gaussian distribution (expectation 0, stddev 1).
+--	- jpcrr.random.nextInt([number bound])
+--		Return random integer [0,bound). If no bound is specified, random 32-bit number is returned.
+--	- jpcrr.random.nextLong()
+--		Return random long.
+--
+
+local stopping = false;
+local mesage_function = nil;
+local lock_function = nil;
+local uiaction_function = nil;
+local stop_function = nil;
+local attach_function = nil;
+local _print_console_msg = print_console_msg;
+
+local handle, err, chunk, indication, k, v;
+
+local loadmod = loadmodule;
+loadmodule = nil;
+
+local export_module_in = function(tab, modname, prefix)
+	local fun = loadmod(modname);
+	if not fun then
+		_print_console_msg("Extension library " .. modname .. " not found");
+		return nil;
+	end
+	for k, v in pairs(fun) do
+		tab[(prefix or "") .. k] = v;
+	end
+end
+
+jpcrr = {};
+jpcrr.hud = {};
+jpcrr.events = {};
+jpcrr.window = {};
+jpcrr.memorysearch = {};
+jpcrr.hostmemory = {};
+jpcrr.random = {};
+bit = {};
+io = {};
+local HUD = {};
+
+export_module_in(jpcrr, "org.jpc.luaextensions.Base");
+export_module_in(jpcrr, "org.jpc.luaextensions.InputDevices");
+export_module_in(jpcrr, "org.jpc.luaextensions.Status");
+export_module_in(jpcrr, "org.jpc.luaextensions.ComponentCoding", "component_");
+export_module_in(jpcrr.events, "org.jpc.luaextensions.Events");
+export_module_in(jpcrr.window, "org.jpc.luaextensions.Window");
+export_module_in(bit, "org.jpc.luaextensions.Bitops");
+export_module_in(jpcrr.memorysearch, "org.jpc.luaextensions.MemorySearch");
+export_module_in(HUD, "org.jpc.luaextensions.HUD");
+export_module_in(jpcrr.hostmemory, "org.jpc.luaextensions.HostMemory");
+export_module_in(jpcrr.random, "org.jpc.luaextensions.Random");
+
+-- HUD bindings.
+local HUD = HUD.HUD;
+jpcrr.HUD = HUD;
+
+-- Few misc functions.
+assert = function(val, err)
+	if (not val) and err then
+		error(err);
+	end
+	return val;
+end
+
+modulus_split = function(number, ...)
+	local dividers = {...};
+	local results = {};
+	local rem;
+
+	for k, v in ipairs(dividers) do
+		rem = number % v;
+		table.insert(results, (number - rem) / v);
+		number = rem;
+	end
+
+	table.insert(results, number);
+	return unpack(results);
+end
+
+jpcrr.register_redraw_function = function(f)
+	if f and type(f) ~= "function" then
+		error("Incorrect type of argument to register_redraw_function");
+	end
+	lock_function = f;
+end
+
+jpcrr.register_message_function = function(f)
+	if f and type(f) ~= "function" then
+		error("Incorrect type of argument to register_message_function");
+	end
+	message_function = f;
+end
+
+jpcrr.register_stop_function = function(f)
+	if f and type(f) ~= "function" then
+		error("Incorrect type of argument to register_stop_function");
+	end
+	stop_function = f;
+end
+
+jpcrr.register_attach_function = function(f)
+	if f and type(f) ~= "function" then
+		error("Incorrect type of argument to register_attach_function");
+	end
+	attach_function = f;
+end
+
+jpcrr.register_uiaction_function = function(f)
+	if f and type(f) ~= "function" then
+		error("Incorrect type of argument to register_uiaction_function");
+	end
+	uiaction_function = f;
+end
+
+
+
+local getmtable = getmetatable;
+local toString = tostring;
+local inject_binary_file;
+local inject_binary_input;
+local inject_binary_output;
+local inject_text_input;
+local inject_text_output;
+local inject_archive_input;
+local inject_archive_output;
+
+-- Class member injectors.
+inject_binary_file = function(obj, name)
+	local _name = name;
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for BinaryFile");
+	end
+	return obj;
+end
+
+inject_binary_input = function(obj, underlying, name)
+	local _name = name;
+	local old_four_to_five = getmtable(obj).four_to_five;
+	local old_inflate = getmtable(obj).inflate;
+	local old_text = getmtable(obj).text;
+	local old_read = getmtable(obj).read;
+	local old_close = getmtable(obj).close;
+	local underlying_object = underlying;
+
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).four_to_five = function(obj)
+		local res, err;
+		res, err = old_four_to_five(obj);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_input(res, obj, "four-to-five<" .. _name .. ">");
+	end
+	getmtable(obj).inflate = function(obj)
+		local res, err;
+		res, err = old_inflate(obj);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_input(res, obj, "inflate<" .. _name .. ">");
+	end
+	getmtable(obj).text = function(obj)
+		local res, err;
+		res, err = old_text(obj);
+		if not res then
+			return res, err;
+		end
+		return inject_text_input(res, obj, "text<" .. _name .. ">");
+	end
+	getmtable(obj).read = function(obj, toread)
+		if toread then
+			return old_read(obj, toread);
+		else
+			local res = "";
+			local ret, err;
+			while true do
+				ret, err = old_read(obj, 16384);
+				if not ret then
+					if not err then
+						return res;
+					end
+					return nil, err;
+				end
+				res = res .. ret;
+			end
+		end
+	end
+	getmtable(obj).close = function(obj)
+		local ret, err, ret2, err2;
+		ret, err = old_close(obj);
+		if underlying_object then ret2, err2 = underlying_object:close(); end
+		if ret and not ret2 then
+			err = err2;
+			ret = ret2;
+		end
+		return ret, err;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for BinaryInput");
+	end
+	return obj;
+end
+
+inject_binary_output = function(obj, underlying, name)
+	local _name = name;
+	local old_four_to_five = getmtable(obj).four_to_five;
+	local old_deflate = getmtable(obj).deflate;
+	local old_text = getmtable(obj).text;
+	local old_close = getmtable(obj).close;
+	local underlying_object = underlying;
+
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).four_to_five = function(obj)
+		local res, err;
+		res, err = old_four_to_five(obj);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_output(res, obj, "four-to-five<" .. _name .. ">");
+	end
+	getmtable(obj).deflate = function(obj)
+		local res, err;
+		res, err = old_deflate(obj);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_output(res, obj, "deflate<" .. _name .. ">");
+	end
+	getmtable(obj).text = function(obj)
+		local res, err;
+		res, err = old_text(obj);
+		if not res then
+			return res, err;
+		end
+		return inject_text_output(res, obj, "text<" .. _name .. ">");
+	end
+	getmtable(obj).close = function(obj)
+		local ret, err, ret2, err2;
+		ret, err = old_close(obj);
+		if underlying_object then ret2, err2 = underlying_object:close(); end
+		if ret and not ret2 then
+			err = err2;
+			ret = ret2;
+		end
+		return ret, err;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for BinaryOutput");
+	end
+	return obj;
+end
+
+inject_text_input = function(obj, underlying, name)
+	local _name = name;
+	local old_close = getmtable(obj).close;
+	local underlying_object = underlying;
+
+	getmtable(obj).lines = function(obj)
+		return function(state, prevline)
+			return state:read();
+		end, obj, nil;
+	end
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).close = function(obj)
+		local ret, err, ret2, err2;
+		ret, err = old_close(obj);
+		if underlying_object then ret2, err2 = underlying_object:close(); end
+		if ret and not ret2 then
+			err = err2;
+			ret = ret2;
+		end
+		return ret, err;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for TextInput");
+	end
+	return obj;
+end
+
+inject_text_output = function(obj, underlying, name)
+	local _name = name;
+	local old_close = getmtable(obj).close;
+	local underlying_object = underlying;
+
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).close = function(obj)
+		local ret, err, ret2, err2;
+		ret, err = old_close(obj);
+		if underlying_object then ret2, err2 = underlying_object:close(); end
+		if ret and underlying_object then
+			err = err2;
+			ret = ret2;
+		end
+		return ret, err;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for TextOutput");
+	end
+	return obj;
+end
+
+inject_archive_input = function(obj, name)
+	local _name = name;
+	local old_member = getmtable(obj).member;
+        local old_member_list = getmtable(obj).member_list;
+	getmtable(obj).member = function(obj, member)
+		local res, err;
+		res, err = old_member(obj, member);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_input(res, nil, _name .. "[" .. member .. "]");
+	end
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).member_list = function(obj)
+		local tab = old_member_list(obj);
+		if tab then table.sort(tab, jpcrr.stringlessthan); end
+		return tab;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for ArchiveInput");
+	end
+	return obj;
+end
+
+inject_archive_output = function(obj, name)
+	local _name = name;
+	local old_member = getmtable(obj).member;
+	getmtable(obj).member = function(obj, member)
+		local res, err;
+		res, err = old_member(obj, member);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_output(res, nil, _name .. "[" .. member .. "]");
+	end
+	getmtable(obj).name = function(obj)
+		return _name;
+	end
+	getmtable(obj).__index = function(tab, name)
+		local x = getmtable(obj)[name];
+		if x then
+			return x;
+		end
+		error("Invalid method " .. name .. " for ArchiveOutput");
+	end
+	return obj;
+end
+
+
+-- Redefined routines.
+do
+	local rprint = print_console_msg;
+	print_console_msg = nil;
+	print = function(...)
+		local x = "";
+		local y = {...};
+		local i;
+		for i = 1,#y do
+			if i > 1 then
+				x = x .. "\t" .. toString(y[i]);
+			else
+				x = toString(y[i]);
+			end
+		end
+		rprint(x);
+	end
+	print_console_msg = nil;
+
+
+end
+
+-- I/O routines.
+local stringfind = string.find;
+local randname = loadmod("org.jpc.luaextensions.DelayedDelete").random_temp_name;
+local selectname = loadmod("org.jpc.luaextensions.BaseFSOps").opensave_dialog;
+local path = args["luapath"] or ".";
+local toresourcename = function(resname, save, text)
+	if not resname then
+		return randname(path .. "/", "luatemp-");
+	end
+
+        if resname == "" and text then
+		local a, b;
+		a, b = selectname(save, text);
+		return a, (a or b);
+        end
+
+	if stringfind(resname, "^/") then
+		if not text then
+			error("Bad resource name (case 2): " .. resname);
+		end
+		local a, b;
+		a, b = selectname(save, string.sub(resname, 2));
+		return a, (a or b);
+	end
+
+	if not stringfind(resname, "[%d%l%u_%-]") then
+		error("Bad resource name (case 1): " .. resname);
+	end
+	if stringfind(resname, "%.%.") then
+		error("Bad resource name (case 3): " .. resname);
+	end
+	if stringfind(resname, "\\") then
+		error("Bad resource name (case 4): " .. resname);
+	end
+
+	return resname, path .. "/" .. resname;
+end
+
+
+do
+	local openbinin = loadmod("org.jpc.luaextensions.BinaryInFile").open;
+	local openbinout = loadmod("org.jpc.luaextensions.BinaryOutFile").open;
+	local openarchin = loadmod("org.jpc.luaextensions.ArchiveIn").open;
+	local openarchout = loadmod("org.jpc.luaextensions.ArchiveOut").open;
+	local openbinary = loadmod("org.jpc.luaextensions.BinaryFile").open;
+
+	local baseFS = loadmod("org.jpc.luaextensions.BaseFSOps");
+	local mkdir = baseFS.mkdir;
+	local unlink = baseFS.unlink;
+	local rename = baseFS.rename;
+
+	local getmtable = getmetatable;
+
+	loadfile = function(_script)
+		local file, file2, err, content;
+		local x, y;
+		x, y = toresourcename(_script, false, "Select script to load");
+		if not x then return x, y; end
+		file, err = openbinin(y, "r");
+		if not file then
+			return nil, "Can't open " .. _script .. ": " .. err;
+		end
+		file2, err = file:text();
+		if not file2 then
+			return nil, "Can't transform " .. _script .. ": " .. err;
+		end
+		content = "";
+		line = file2:read();
+		while line do
+			content = content .. line .. "\n";
+			line = file2:read();
+		end
+		file2:close();
+		file:close();
+		return loadstring(content, _script);
+	end
+
+	io.open = function(name, mode)
+		local _name;
+		local res, err;
+		local y;
+                if mode == "r" then
+			_name, y = toresourcename(name, false, "Select file to read");
+		else
+			_name, y = toresourcename(name, true, "Select file to write");
+		end
+		if not _name then return _name, y; end
+		res, err = openbinary(y, mode);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_file(res, _name);
+	end
+
+	io.open_arch_read = function(name)
+		local _name = name;
+		local res, err;
+		local y;
+		_name, y = toresourcename(name, false, "Select archive to read");
+		if not _name then return _name, y; end
+		res, err = openarchin(y);
+		if not res then
+			return res, err;
+		end
+		return inject_archive_input(res, _name);
+	end
+
+	io.open_arch_write = function(name)
+		local _name = name;
+		local res, err;
+		local y;
+		_name, y = toresourcename(name, true, "Select archive to write");
+		if not _name then return _name, y; end
+		res, err = openarchout(y);
+		if not res then
+			return res, err;
+		end
+		return inject_archive_output(res, _name);
+	end
+
+	io.open_read = function(name)
+		local _name = name;
+		local res, err;
+		local y;
+		_name, y = toresourcename(name, false, "Select file to read");
+		if not _name then return _name, y; end
+		res, err = openbinin(y);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_input(res, nil, _name);
+	end
+
+	io.open_write = function(name)
+		local _name = name;
+		local res, err;
+		local y;
+		_name, y = toresourcename(name, true, "Select file to write");
+		if not _name then return _name, y; end
+		res, err = openbinout(y);
+		if not res then
+			return res, err;
+		end
+		return inject_binary_output(res, nil, _name);
+	end
+
+	io.mkdir = function(name)
+		local _name, y;
+		_name, y = toresourcename(name);
+		if mkdir(y) then
+			return _name;
+		else
+			return nil;
+		end
+	end
+
+	io.unlink = function(name)
+		local _name, y;
+		_name, y = toresourcename(name);
+		if unlink(y) then
+			return _name;
+		else
+			return nil;
+		end
+	end
+
+	io.rename = function(name1, name2)
+		local _name, y;
+		local _name2, y2;
+		_name, y = toresourcename(name1);
+		_name2, y2 = toresourcename(name2);
+		if rename(y, y2) then
+			return _name, _name2;
+		else
+			return nil;
+		end
+	end
+
+	io.transform = {};
+
+	io.transform.text = function()
+		return function(obj)
+			return obj:text();
+		end
+	end
+
+	io.transform.four_to_five = function()
+		return function(obj)
+			return obj:four_to_five();
+		end
+	end
+
+	io.transform.inflate = function()
+		return function(obj)
+			return obj:inflate();
+		end
+	end
+
+	io.transform.deflate = function()
+		return function(obj)
+			return obj:deflate();
+		end
+	end
+
+	io.dotransform = function(obj, ...)
+		local todo = {...};
+		local k, v;
+		local obj2, err;
+		for k, v in ipairs(todo) do
+			obj2, err = v(obj);
+			if not obj2 then
+				obj:close();
+				return nil, err;
+			end
+			obj = obj2;
+		end
+		return obj;
+	end
+
+	io.dotransform2 = function(obj, err, ...)
+		if not obj then
+			return obj, err;
+		end
+		return io.dotransform(obj, err, ...);
+	end
+
+end
+
+-- Various stuff built on top of ECI.
+local invoke = jpcrr.invoke;
+local invokecall = jpcrr.call;
+local invokesync = jpcrr.invoke_synchronous;
+
+jpcrr.sendevent = function(...)
+	local arguments = {...};
+	local k, v;
+	for k, v in ipairs(arguments) do
+		arguments[k] = toString(v);
+	end
+	invokesync("sendevent", arguments);
+end
+
+jpcrr.sendevent_lowbound = function(...)
+	local arguments = {...};
+	local k, v;
+	for k, v in ipairs(arguments) do
+		arguments[k] = toString(v);
+	end
+	invokesync("sendevent-lowbound", arguments);
+end
+
+jpcrr.save_state = function(name)
+	local _name, _fname;
+	_name, _fname = toresourcename(name, true, "File to savestate to");
+	invokesync("state-save", {_fname});
+	return _name;
+end
+
+jpcrr.save_movie = function(name)
+	local _name, _fname;
+	_name, _fname = toresourcename(name, true, "File to save movie to");
+	invokesync("movie-save", {_fname});
+	return _name;
+end
+
+jpcrr.load_state_normal = function(name)
+	local _name, _fname;
+	_name, _fname = toresourcename(name, false, "File to loadstate from");
+	invokesync("state-load", {_fname});
+	return _name;
+end
+
+jpcrr.load_state_preserve_events = function(name)
+	local _name, _fname;
+	_name, _fname = toresourcename(name, false, "File to loadstate (preserve events) from");
+	invokesync("state-load-noevents", {_fname});
+	return _name;
+end
+
+jpcrr.load_state_movie = function(name)
+	local _name, _fname;
+	_name, _fname = toresourcename(name, false, "File to load movie from");
+	invokesync("movie-load", {_fname});
+	return _name;
+end
+
+jpcrr.assemble = function()
+	invokesync("pc-assemble");
+end
+
+jpcrr.change_authors = function()
+	invokesync("change-authors");
+end
+
+jpcrr.ram_dump = function(name, binary)
+	local _name, _fname;
+	_name, _fname = toresourcename(name, true, "Select file to ramdump to");
+	if binary then
+		invokesync("ram-dump-binary", {_fname});
+	else
+		invokesync("ram-dump-text", {_fname});
+	end
+	return _name;
+end
+
+local poll_event = jpcrr.poll_event;
+local _print = print;
+local _unlock = jpcrr.release_vga;
+jpcrr.poll_event = function()
+	local a, b;
+	local failed = false;
+	while not failed do
+		a, b = poll_event();
+		if not a then
+			failed = true;
+		end
+		if a and a == "message" and message_function then
+			a, b = pcall(message_function, b);
+			if not a then
+				_print("Error running message callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "uiaction" and uiaction_function then
+			a, b = pcall(uiaction_function, b);
+			if not a then
+				_print("Error running uiaction callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "stop" and stop_function then
+			a, b = pcall(stop_function);
+			if not a then
+				_print("Error running stop callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "attach" and attach_function then
+			a, b = pcall(attach_function);
+			if not a then
+				_print("Error running attach callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "lock" and lock_function then
+			a, b = pcall(lock_function);
+			_unlock();
+			if not a then
+				_print("Error running redraw callback: " .. b);
+			end
+			if stoppping then
+				return "lock";
+			end
+			a = nil;
+		end
+		if a and a == "lock" and stopping then
+			_unlock();
+			return "lock";
+		end
+	end
+	return a, b;
+end
+
+
+local wait_event = jpcrr.wait_event;
+local _print = print;
+local _unlock = jpcrr.release_vga;
+jpcrr.wait_event = function()
+	local a, b;
+	while not a do
+		a, b = wait_event();
+		if a and a == "message" and message_function then
+			a, b = pcall(message_function, b);
+			if not a then
+				_print("Error running message callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "uiaction" and uiaction_function then
+			a, b = pcall(uiaction_function, b);
+			if not a then
+				_print("Error running uiaction callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "stop" and stop_function then
+			a, b = pcall(stop_function);
+			if not a then
+				_print("Error running stop callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "attach" and attach_function then
+			a, b = pcall(attach_function);
+			if not a then
+				_print("Error running attach callback: " .. b);
+			end
+			a = nil;
+		end
+		if a and a == "lock" and lock_function then
+			a, b = pcall(lock_function);
+			_unlock();
+			if not a then
+				_print("Error running redraw callback: " .. b);
+			end
+			if stopping then
+				return a, b;
+			end
+			a = nil;
+		end
+	end
+	return a, b;
+end
+
+
+jpcrr.hud.left_gap = function(f, g)
+	HUD("left_gap", f, g);
+end
+
+jpcrr.hud.right_gap = function(f, g)
+	HUD("right_gap", f, g);
+end
+
+jpcrr.hud.top_gap = function(f, g)
+	HUD("top_gap", f, g);
+end
+
+jpcrr.hud.bottom_gap = function(f, g)
+	HUD("bottom_gap", f, g);
+end
+
+jpcrr.hud.white_solid_box = function(f, x, y, w, h)
+	HUD("hud_white_solid_box", f, x, y, w, h);
+end
+
+jpcrr.hud.box = function(f, x, y, w, h, t, lr, lg, lb, la, fr, fg, fb, fa)
+	la = la or 255;
+	fr = fr or 0;
+	fg = fg or 0;
+	fb = fb or 0;
+	fa = fa or 0;
+	HUD("box", f, x, y, w, h, t, lr, lg, lb, la, fr, fg, fb, fa);
+end
+
+jpcrr.hud.circle = function(f, x, y, r, t, lr, lg, lb, la, fr, fg, fb, fa)
+	la = la or 255;
+	fr = fr or 0;
+	fg = fg or 0;
+	fb = fb or 0;
+	fa = fa or 0;
+	HUD("circle", f, x, y, r, t, lr, lg, lb, la, fr, fg, fb, fa)
+end
+
+jpcrr.hud.bitmap = function(f, x, y, bmap, lr, lg, lb, la, fr, fg, fb, fa)
+	la = la or 255;
+	fr = fr or 0;
+	fg = fg or 0;
+	fb = fb or 0;
+	fa = fa or 0;
+	HUD("bitmap", f, x, y, bmap, lr, lg, lb, la, fr, fg, fb, fa)
+end
+
+jpcrr.hud.bitmap_binary = function(f, x, y, bmap, lr, lg, lb, la, fr, fg, fb, fa)
+	la = la or 255;
+	fr = fr or 0;
+	fg = fg or 0;
+	fb = fb or 0;
+	fa = fa or 0;
+	HUD("bitmap_binary", f, x, y, bmap, lr, lg, lb, la, fr, fg, fb, fa)
+end
+
+jpcrr.hud.chargen = function(f, x, y, text, multiline, lr, lg, lb, la, fr, fg, fb, fa)
+	la = la or 255;
+	fr = fr or 0;
+	fg = fg or 0;
+	fb = fb or 0;
+	fa = fa or 0;
+	HUD("vga_chargen", f, x, y, text, lr, lg, lb, la, fr, fg, fb, fa, multiline)
+end
+
+jpcrr.shutdown_emulator = function()
+	invokesync("shutdown-emulator", {});
+end
+
+jpcrr.set_pccontrol_pos = function(x, y)
+	invokesync("pccontrol-setwinpos", {toString(x), toString(y)});
+end
+
+jpcrr.set_luaplugin_pos = function(x, y)
+	invokesync("luaplugin-setwinpos", {toString(x), toString(y)});
+end
+
+jpcrr.set_pcmonitor_pos = function(x, y)
+	invokesync("pcmonitor-setwinpos", {toString(x), toString(y)});
+end
+
+jpcrr.set_pcstartstoptest_pos = function(x, y)
+	invokesync("pcstartstoptest-setwinpos", {toString(x), toString(y)});
+end
+
+jpcrr.set_virtualkeyboard_pos = function(x, y)
+	invokesync("virtualkeyboard-setwinpos", {toString(x), toString(y)});
+end
+
+jpcrr.exit = function()
+	invokesync("luaplugin-terminate");
+end
+
+jpcrr.pc_start = function()
+	invoke("pc-start");
+end
+
+jpcrr.pc_stop = function()
+	invokesync("pc-stop");
+end
+
+jpcrr.screenshot = function(include_hud)
+	if include_hud then
+		invoke("screenshot-renderbuffer");
+	else
+		invoke("screenshot-vgabuffer");
+	end
+end
+
+jpcrr.bios_kbd_trap = function(is_on)
+	if is_on then
+		invokesync("trap-bios-kbd-on");
+	else
+		invokesync("trap-bios-kbd-off");
+	end
+end
+
+jpcrr.vretrace_start_trap = function(is_on)
+	if is_on then
+		invokesync("trap-vretrace-start-on");
+	else
+		invokesync("trap-vretrace-start-off");
+	end
+end
+
+jpcrr.vretrace_end_trap = function(is_on)
+	if is_on then
+		invokesync("trap-vretrace-end-on");
+	else
+		invokesync("trap-vretrace-end-off");
+	end
+end
+
+jpcrr.timed_trap = function(nsecs)
+	if nsecs then
+		invokesync("trap-timed", {toString(nsecs)});
+	else
+		invokesync("trap-timed-disable");
+	end
+end
+
+jpcrr.write_byte = function(addr, value)
+	invokesync("memory-write", {toString(addr), toString(value), "1"});
+end
+
+jpcrr.write_word = function(addr, value)
+	invokesync("memory-write", {toString(addr), toString(value), "2"});
+end
+
+jpcrr.write_dword = function(addr, value)
+	invokesync("memory-write", {toString(addr), toString(value), "4"});
+end
+
+jpcrr.read_byte = function(addr)
+	local t = {toString(addr), "1"};
+	t = invokecall("memory-read", t);
+	return (t or {})[1];
+end
+
+jpcrr.read_word = function(addr)
+	local t = {toString(addr), "2"};
+	t = invokecall("memory-read", t);
+	return (t or {})[1];
+end
+
+jpcrr.read_dword = function(addr)
+	local t = {toString(addr), "4"};
+	t = invokecall("memory-read", t);
+	return (t or {})[1];
+end
+
+jpcrr.read_byte_signed = function(addr)
+	local t = {toString(addr), "1"};
+	t = invokecall("memory-read", t);
+	return bit.tosigned((t or {})[1], 7);
+end
+
+jpcrr.read_word_signed = function(addr)
+	local t = {toString(addr), "2"};
+	t = invokecall("memory-read", t);
+	return bit.tosigned((t or {})[1], 15);
+end
+
+jpcrr.read_dword_signed = function(addr)
+	local t = {toString(addr), "4"};
+	t = invokecall("memory-read", t);
+	return bit.tosigned((t or {})[1], 31);
+end
+
+local e_wait_event = jpcrr.wait_event;
+local running = jpcrr.pc_running;
+local stop_and_execute_in_progress = false;
+jpcrr.stop_and_execute = function(f)
+	local a, b;
+	_unlock();
+	if stop_and_execute_in_progress then
+		return false;
+	end
+	if not running() then
+		a, b = pcall(f);
+		if not a then
+			error("Error in after stop callback: " .. b);
+		end
+		return true;
+	end
+	jpcrr.pc_stop();
+	while true do
+		stop_and_execute_in_progress = true;
+		a, b = e_wait_event();
+		stop_and_execute_in_progress = false;
+		if a and a == "lock" then
+			_unlock();
+			if stopping then
+				break;
+			end
+		elseif a and (a == "stop" or a == "attach") then
+			stopping = true;
+		end
+	end
+	stopping = false;
+	a, b = pcall(f);
+	if not a then
+		error("Error in after stop callback: " .. b);
+	end
+	return true;
+end
+
+-- Various legacy functions.
+local legacy_warning = {};
+local warn_legacy = function(name)
+	if not legacy_warning[name] then
+		_print("Warning: " .. name .. " is deprecated.");
+		legacy_warning[name] = true;
+	end
+end
+
+jpcrr.pc_running = function()
+	warn_legacy("jpcrr.pc_running");
+	local status = jpcrr.status();
+	return (status ~= nil) and status.running;
+end
+
+jpcrr.clock_time = function()
+	warn_legacy("jpcrr.clock_time");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.time;
+end
+
+jpcrr.vga_edge_count = function()
+	warn_legacy("jpcrr.vga_edge_count");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.vga_retraces_seen or 0;
+end
+
+jpcrr.pc_connected = function()
+	warn_legacy("jpcrr.pc_connected");
+	local status = jpcrr.status();
+	return status ~= nil;
+end
+
+jpcrr.vga_scroll_count = function()
+	warn_legacy("jpcrr.vga_scroll_count");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.vga_scroll_count or 0;
+end
+
+jpcrr.vga_resolution = function()
+	warn_legacy("jpcrr.vga_scroll_count");
+	local status = jpcrr.status();
+	if not status then
+		return 0, 0;
+	end
+	return status.resolution_x, status.resolution_y;
+end
+
+jpcrr.get_irq0_info = function()
+	warn_legacy("jpcrr.get_irq0_info");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.irq0_dispatched, status.irq0_frequency;
+end
+
+jpcrr.frame_number = function()
+	warn_legacy("jpcrr.frame_number");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.frame;
+end
+
+jpcrr.movie_rerecords = function()
+	warn_legacy("jpcrr.movie_rerecords");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.movie_rerecords;
+end
+
+jpcrr.movie_length = function()
+	warn_legacy("jpcrr.movie_length");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.movie_length;
+end
+
+jpcrr.movie_headers = function()
+	warn_legacy("jpcrr.movie_headers");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.movie_headers;
+end
+
+jpcrr.project_id = function()
+	warn_legacy("jpcrr.project_id");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.project_id;
+end
+
+jpcrr.keyboard_leds = function()
+	warn_legacy("jpcrr.keyboard_leds");
+	local status = jpcrr.status();
+	if not status or status.keyboard_leds_valid == nil then
+		return nil;
+	end
+	if not status.keyboard_leds_valid then
+		return false;
+	end
+	return status.keyboard_num_lock, status.keyboard_caps_lock, status.keyboard_scroll_lock;
+end
+
+jpcrr.joystick_state = function()
+	warn_legacy("jpcrr.joystick_state");
+	local status = jpcrr.status();
+	if not status or status.joystick_ax == nil then
+		return nil;
+	end
+	return status.joystick_ax, status.joystick_ay, status.joystick_bx, status.joystick_by,
+		status.joystick_aa, status.joystick_ab, status.joystick_ba, status.joystick_bb;
+end
+
+jpcrr.mouse_state = function()
+	warn_legacy("jpcrr.mouse_state");
+	local status = jpcrr.status();
+	if not status then
+		return nil;
+	end
+	return status.mouse_dx_pending, status.mouse_dy_pending, status.mouse_dz_pending,
+		status.mouse_button_1, status.mouse_button_2, status.mouse_button_3, status.mouse_button_4,
+		status.mouse_button_5;
+end
+
+jpcrr.invoke = nil;
+jpcrr.invoke_synchronous = nil;
+jpcrr.call = null
+
+-- Dofile.
+dofile = function(_script)
+	local chunk, err, indication
+	chunk, err = loadfile(_script);
+	if not chunk then
+		error("Kernel: Can't load subscript " .. _script .. ": " .. err);
+	end
+	return chunk();
+end
+
+local args2 = args;
+args = null;
+args = {};
+for k, v in pairs(args2) do
+	if (#k > 2 and string.byte(k, 1) == 120 and string.byte(k, 2) == 45) then
+		args[string.sub(k, 3)] = v;
+	end
+end
+jpcrr_raw = null;
+
+do
+	chunk = null;
+	loaded, err = pcall(function()
+		chunk, err = loadfile(script);
+		if not chunk then
+			error(err);
+		end
+	end);
+	if not loaded then
+		print("Kernel: Can't load script " .. script .. ": " .. err);
+		invoke("luaplugin-terminate");
+		while true do end
+	end
+
+	script = null;
+	indication, err = pcall(chunk);
+	if not indication then
+		print("Kernel: Unprotected error in script: " .. err);
+		invoke("luaplugin-terminate");
+		while true do end
+	end
+end

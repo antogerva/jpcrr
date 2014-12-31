@@ -1,0 +1,100 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>jpcrr</groupId>
+	<artifactId>jpcrr</artifactId>
+	<version>r11.8-rc1-test1</version>
+	<name>jpcrr</name>
+	<packaging>jar</packaging>
+
+	<properties>
+		<jdk.version>1.7</jdk.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>project.local</id>
+			<url>file://${project.basedir}/lib/local-repo</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jnativehook</groupId>
+			<artifactId>JNativeHook</artifactId>
+			<version>1.1.4</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+			<!-- mvn exec:java -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.3.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>JPCApplication</mainClass>
+					<arguments>
+						<argument>-autoexec assemble.jpcrrinit</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+			<!-- mvn jar:jar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>JPCApplication</mainClass>
+						</manifest>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- mvn clean compile assembly:single -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>JPCApplication</mainClass>
+						</manifest>
+					</archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+					<!--  
+					<descriptors>
+					  <descriptor>src/main/resources/assembly/jar-with-dependencies.xml</descriptor>
+					</descriptors>
+					-->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
